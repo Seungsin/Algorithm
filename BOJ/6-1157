@@ -1,0 +1,45 @@
+#include <iostream>
+#include <string>
+#include <map>
+
+using namespace std;
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	string input;
+	map<char, int> counting;
+	char max_char;
+	int max_count = 0, dup_count = 0;
+	
+	cin >> input;
+
+	for(char check:input){
+		check = toupper(check);
+		if(counting.find(check) != counting.end()){
+			counting[check]++;
+		}//key가 존재하면
+		else{
+			counting[check] = 1;
+		}//key가 없으면
+	}
+
+	//map을 돌면서 최댓값 찾기
+	for(pair<char,int> p : counting){
+		if(max_count<p.second){
+			max_char = p.first;
+			max_count = p.second;
+			dup_count = 0;
+		}else if(max_count==p.second){
+			dup_count++;
+		}
+	}
+
+	if(dup_count){
+		cout << "?";
+	}else{
+		cout << max_char;
+	}
+}
