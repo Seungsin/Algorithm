@@ -1,0 +1,43 @@
+/*
+priority_queue 오버로딩
+=> true면 위치 변경, false면 변경 없음
+*/
+
+#include <iostream>
+#include <string>
+#include <queue>
+
+using namespace std;
+
+struct cmp {
+	bool operator()(int a, int b) {
+		if (abs(a) > abs(b)) return true;
+		else if (abs(a) < abs(b)) return false;
+		else if (a > b) return true;
+		else return false;
+	}
+};
+
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	priority_queue<int, vector<int>, cmp> q;
+	int n, temp;
+	cin >> n;
+	for (int i = 0;i < n;i++) {
+		cin >> temp;
+		if (!temp) {
+			if (q.size()) {
+				cout << q.top() << "\n";
+				q.pop();
+			}
+			else cout << 0 << "\n";
+		}
+		else {
+			q.push(temp);
+		}
+	}
+}
