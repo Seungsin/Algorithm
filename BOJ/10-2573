@@ -1,0 +1,113 @@
+/*
+백준 2573 빙산
+
+조건
+- 배열 : 빙산의 높이(0은 바다)
+- 빙산은 인근 노드의 0의 개수만큼 줄어듦.
+- 구하는 것 : 빙산이 두 덩어리 이상으로 분리되는 최초의 시간 구하기
+** 전부 다 녹을 때까지 두 덩어리 이상으로 분리되지 않으면 0을 출력해야 함
+
+풀이
+- DFS로 빙산 돌아댕기면서 얘가 한덩이인지 두덩이인지 확인하는 함수
+- 빙산 다 돌아댕기면서 주변의 0 개수 저장해서 한 번에 빼주기
+*/
+
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+int N,M;
+int ice[301][301];
+int melt[301][301] = {0,};
+int group[301][301] = {0,};
+int px[4]={0,0,1,-1};
+int py[4]={1,-1,0,0};
+
+void makeGroup(int i,int j, int groupNum){
+	queue<pair<int,int>> q;
+	int x,y,tempx,tempy;
+
+	q.push({i,j});
+	group[i][j] = 1;
+
+	while(!q.empty()){
+		x = q.front().first;
+		y = q.front().second;
+		q.pop();
+
+		for(int i=0;i<4;i++){
+			tempx = x+px[i];
+			tempy = y+py[i];
+			if(group[tempx][tempy]==0 && ice[tempx][tempy]>0){
+				group[tempx][tempy] = groupNum;
+				q.push({tempx,tempy});
+			}
+		}
+	}
+}
+
+int countIce(){
+	int countGroup = 1;
+	for(int i=0;i<N;i++){
+		for(int j=0;j<M;j++) group[i][j] = 0;
+	}
+
+	for(int i=0;i<N;i++){
+		for(int j=0;j<M;j++){
+			if(ice[i][j]>0 && group[i][j]==0) makeGroup(i,j, countGroup++);
+		}
+	}
+
+	return countGroup;
+}
+
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	int count0=0;
+	int year=0;
+	int countICE;
+
+	cin >> N >> M;
+	for(int i=0;i<N;i++){
+		for(int j=0;j<M;j++){
+			cin >> ice[i][j];
+		}
+	}
+
+	do{
+		year++;
+		//melt ice
+		for(int i=0;i<N;i++){
+			for(int k=0;k<M;k++){
+				count0=0;
+				if(ice[i][k]>0){
+					for(int j=0;j<4;j++){
+						if(ice[i+px[j]][k+py[j]]<=0)count0++;
+					}
+				}
+				melt[i][k]=count0;
+			}
+		}
+
+		for(int i=0;i<N;i++){
+			for(int j=0;j<M;j++){
+				ice[i][j] -=melt[i][j];
+			}
+		}
+
+		//count ice
+		countICE = countIce();
+		if(countICE == 1){
+			year = 0;
+			break;
+		}
+		else if(countICE!=2) break;
+	}while(true);
+
+	cout <<year;
+}
