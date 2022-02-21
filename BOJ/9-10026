@@ -1,0 +1,92 @@
+/*
+백준 10026 적록색약
+
+조건
+- N*N -> R,G,B(3)
+- 적록색약은 R과 G를 구분할 수 없음
+- 정상적사람 적록색약사람으로 출력
+
+풀이
+1. group 배열 만들어서 0으로 전부 초기화
+2. group배열 전체 탐색하면서 0인 node에 들어가기(DFS로 근처 같은 색깔에 group번호 추가)
+3. group에 0 없을때까지 반복
+** group은 1,2fh 정상/적록으로 나누어서 하면 될듯
+*/
+
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+int groupCount1 = 0, groupCount2 = 0;
+char color[100][100];
+int group1[100][100]={0,};
+int group2[100][100]={0,};
+int N;
+int px[4]={0,0,1,-1};
+int py[4]={1,-1,0,0};
+
+void findGroup(int index, int i, int j){
+	int x,y, tempx, tempy;
+	queue<pair<int, int>> q;
+	q.push({i,j});
+	if(index==1) group1[i][j] = ++groupCount1;
+	else group2[i][j] = ++groupCount2;
+
+	while(!q.empty()){
+		x=q.front().first;
+		y=q.front().second;
+		q.pop();
+
+		for(int k=0;k<4;k++){
+			tempx = x+px[k];
+			tempy = y+py[k];
+
+			if(tempx<0||tempy<0||tempx>=N||tempy>=N) continue;
+			else{
+				if(index == 1){
+					if(color[tempx][tempy]==color[i][j] && group1[tempx][tempy]==0){
+						group1[tempx][tempy] = groupCount1;
+						q.push({tempx,tempy});
+					}
+				}else{
+					if(color[i][j]=='B'&&color[tempx][tempy]==color[i][j] && group2[tempx][tempy]==0){
+						group2[tempx][tempy] = groupCount2;
+						q.push({tempx,tempy});
+					}else if(color[i][j]!='B'&&color[tempx][tempy]!='B' && group2[tempx][tempy]==0){
+						group2[tempx][tempy] = groupCount2;
+						q.push({tempx,tempy});
+					}
+				}
+			}
+		}
+	}
+}
+
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	char temp;
+
+	cin >> N;
+	
+	for(int i=0;i<N;i++){
+		for(int j=0;j<N;j++){
+			cin>>temp;
+			color[i][j] = temp;
+		}
+	}
+
+	for(int i=0;i<N;i++){
+		for(int j=0;j<N;j++){
+			if(group1[i][j]==0) findGroup(1, i, j);
+			if(group2[i][j]==0) findGroup(2, i, j);
+		}
+	}
+
+	cout << groupCount1 << " " << groupCount2;
+
+}
