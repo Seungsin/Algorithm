@@ -1,0 +1,95 @@
+/*
+백준 2636 치즈
+
+문제
+- 공기가 닿은 치즈를 녹이기(치즈 안에 있는 구멍은 공기X)
+- 치즈가 모두 녹아 없어지는데 걸리는 시간, 마지막 치즈 조각 칸 수
+
+풀이
+* 0인 부분이 공기가 있나 없나 구분해야함
+1. 공기는 0,0부터 쭉 연결된 아이들이 가짐 -> BFS로 얘만 찾으면댐
+2. 치즈를 녹이자
+1,2 반복
+*/
+
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+int N, M;
+int cheeze[100][100] = {0,};
+int isAir[100][100];
+int px[4] = {0,0,1,-1};
+int py[4] = {1,-1,0,0};
+
+void checkAir(){
+	queue<pair<int, int>> q;
+	int x, y;
+
+	for(int i=0;i<N;i++){
+		for(int j=0;j<M;j++) isAir[i][j] = 0;
+	}
+
+	q.push({0,0});
+	isAir[0][0] = 1;
+
+	while(!q.empty()){
+		for(int i=0;i<4;i++){
+			x = q.front().first + px[i];
+			y = q.front().second + py[i];
+
+			if(x<0||y<0||x>=N||y>=M) continue;
+
+			if(cheeze[x][y] == 0 && isAir[x][y] == 0){
+				q.push({x,y});
+				isAir[x][y] = 1;
+			}
+		}
+
+		q.pop();
+	}
+}
+
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	int hour = 0;
+	int nowCheeze, beforeCheeze = 0;
+
+	cin >> N >> M;
+	for(int i=0;i<N;i++){
+		for(int j=0;j<M;j++){
+			cin >> cheeze[i][j];
+		}
+	}
+
+	do{
+		hour++;
+		nowCheeze = 0;
+
+		checkAir();
+
+		for(int i=0;i<N;i++){
+			for(int j=0;j<M;j++){
+				if(cheeze[i][j] == 1){
+					nowCheeze++;
+					for(int k=0;k<4;k++){
+						if(isAir[i+px[k]][j+py[k]] == 1) {
+							cheeze[i][j] = 0;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		if(nowCheeze == 0) break;
+		else beforeCheeze = nowCheeze;
+	}while(1);
+
+	cout << hour-1 << "\n" << beforeCheeze;
+}
