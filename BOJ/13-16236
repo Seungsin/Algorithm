@@ -1,0 +1,117 @@
+/*
+백준 16236 아기상어
+
+문제
+- 물고기 M마리(크기 다양), 크기 2 아기상어
+- 자기보다 큰 물고기 있는 칸 통과X, 자기보다 크기 작은 물고기 섭취, 같으면 통과만 가능
+- 먹을 수 있는 가장 가까운 물고기 먹기(우선순위 가장 위>가장 왼쪽(x작고 y작고))
+- 언제까지 혼자 할 수 있는지 최대시간
+- 9가 아기상어 위치임
+- 자기의 크기만큼 물고기를 먹어야 성장함(크기 2이면 2마리 먹어야함)
+
+풀이
+- for문 돌려서 먹을 물고기 있으면 현재 위치에서 거까지 거리 구함(bfs이용)
+- 가장 min인 곳 가서 먹기
+이걸 반복하기
+*/
+
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+int N;
+int sea[20][20];
+int distances[20][20] = {0,};
+pair<int, int> shark;
+int shark_size = 2;
+
+int px[4] = {0,0,1,-1};
+int py[4] = {1,-1,0,0};
+
+int findWay(int n, int m){
+	queue<pair<int, int>> q;
+	int x, y;
+
+	if(distances[n][m] != 0) return distances[n][m];
+
+	q.push({shark.first,shark.second});
+
+	while(!q.empty()){
+		for(int i=0;i<4;i++){
+			x = q.front().first + px[i];
+			y = q.front().second + py[i];
+
+			if(x<0||y<0||x>=N||y>=N) continue;
+
+			if(sea[x][y]<=shark_size && distances[x][y]==0){
+				distances[x][y] = distances[q.front().first][q.front().second] + 1;
+				q.push({x,y});
+			}
+			if(x == n && y == m) return distances[n][m];
+		}
+
+		q.pop();
+	}
+
+	return 401;
+}
+
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	int eat = 0;
+	int temp_way;
+	int min_way = 401;
+	int hour = 0;
+	pair<int, int> min_pos;
+
+	cin >> N;
+
+	for(int i=0;i<N;i++){
+		for(int j=0;j<N;j++){
+			cin >> sea[i][j];
+			if(sea[i][j]== 9) shark = {i,j};
+		}
+	}
+
+	sea[shark.first][shark.second] = 0;
+
+	do{
+		min_way = 401;
+
+		for(int i=0;i<N;i++){
+			for(int j=0;j<N;j++) distances[i][j] = 0;
+		}
+
+		for(int i=0;i<N;i++){
+			for(int j=0;j<N;j++){
+				if(sea[i][j]!=0 && sea[i][j]<shark_size){
+					temp_way = findWay(i,j);
+					if(min_way>temp_way){
+						min_way = temp_way;
+						min_pos = {i, j};
+					}
+				}
+			}
+		}
+
+		if(min_way == 401) break;
+		else{
+			hour += min_way;
+			shark = min_pos;
+			sea[min_pos.first][min_pos.second] = 0;
+			eat++;
+			
+			if(shark_size == eat){
+				shark_size++;
+				eat = 0;
+			}
+		}
+	}while(1);
+
+	cout << hour;
+}
