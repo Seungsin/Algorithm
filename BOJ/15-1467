@@ -1,0 +1,47 @@
+/*
+백준 1463 1로 만들기
+
+문제
+- 3 or 2로 나눠지면 그걸로 나누거나 1 빼기
+- 최소 연산 횟수 구하기
+
+풀이
+- 
+*/
+
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	int x;
+	int iterCount[1000001] = {0,};
+	int index;
+
+	cin >> x;
+
+	if(x==1){
+		cout << 0;
+		return 0;
+	}
+	
+	for(int i=2;i<=x;i++){
+		if(iterCount[i] == 0 || iterCount[i]>iterCount[i-1]+1){
+			iterCount[i] = iterCount[i-1]+1;
+		}
+		if(i%2==0&&(iterCount[i]==0||iterCount[i]>iterCount[i/2]+1)){
+			iterCount[i] = iterCount[i/2]+1;
+		}
+		if(i%3==0&&(iterCount[i]==0||iterCount[i]>iterCount[i/3]+1)){
+			iterCount[i] = iterCount[i/3]+1;
+		}
+	}
+
+	cout <<iterCount[x];	
+}
